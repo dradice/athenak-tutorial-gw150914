@@ -125,9 +125,10 @@ give_bare_mass = true              # User provides bare masses not target M_ADM
 Note that we specify the initial data by providing the puncture bare masses (`par_m_plus` and `par_m_minus`), and not their gravitational mass. In particular, this means that the values `target_M_plus` and `target_M_minus` are ignored. However, `TwoPuncturesC` can optionally construct initial data specified by the actual masses of the black holes. This is achieved by setting `give_bare_mass = false`. In this case, the code uses the `target_M_plus` and `target_M_minus` to determine the puncture masses `par_m_plus` and `par_m_minus`.
 
 Note that `TwoPunctures` takes as input `par_b` and `center_offset` instead of the location of the two punctures $x_0$ and $x_1$. The formers are computed as
-$$
+
+```math
 \texttt{par\_b} = \frac{|x_0 - x_1|}{2}, \qquad \texttt{center\_offset1} = x_0 - \texttt{par\_b}.
-$$
+```
 
 ## Running the Code
 

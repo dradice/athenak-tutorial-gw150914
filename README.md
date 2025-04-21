@@ -214,7 +214,7 @@ of the variables at any specified extraction radius.
 Finally, the spherical harmonic coefficients and the radially interpolated 
 values of ADM variables are written to a binary format file (`.bin`) 
 to be used in world tube boundary data of the `Spectre CCE` code.
----
+
 
 # Requirements
 
@@ -226,7 +226,7 @@ to be used in world tube boundary data of the `Spectre CCE` code.
    - `scipy`  
    - `matplotlib`  
 
----
+
 
 # Compute CCE Strains using `Spectre CCE`
 

@@ -64,9 +64,9 @@ x3min = -1.0
 x3max = 1.0
 ~~~
 
-creates a refined region with a resolution $h = (2048/128)\cdot 2^{-11} = 0.0078125$ covering at least a region of extent $\pm 1$ around the location of the first black hole. This corresponds to ${\sim}32$ points across the coordinate diameter of the puncture. Note that, because `AthenaK` uses block-based AMR and enforces a maximum of 2:1 refinement between neighboring mesh blocks, the initial grid is composed of multiple nested refined regions.
+creates a refined region with a resolution $h = (2048/128)\cdot 2^{-11} = 0.0078125$ covering at least a region of extent $\pm 1$ around the location of the first black hole. This corresponds to ${\sim}32$ points across the coordinate diameter of the puncture. Note that, because `AthenaK` uses block-based AMR and enforces a maximum of 2:1 refinement between neighboring mesh blocks, the initial grid is composed of multiple nested refined regions. An outline of the grid in the vicinity of the punctures, obtained with [plot_mesh.py](https://github.com/IAS-Astrophysics/athenak/blob/main/vis/python/plot_mesh.py), is shown in the figure below.
 
-**TODO: add a plot of the grid**
+![Structure of the initial grid in the inner region of the domain.](assets/amr_grid_structure.png)
 
 `AthenaK` has different options for AMR. Here, we use the position of the black holes to determine the resolution at each point in the grid.
 
@@ -133,8 +133,6 @@ $$
 
 ### Code Performance
 
-**TODO: scaling data**
-
 We run our calculation on 32 nodes of ALCF's Aurora. With these resources `AthenaK` performs $1.16 \times 10^9$ zone cycle updates per second, corresponding to a speed of about $450\ M/\mathrm{day}$.
 
 ### Logistics
@@ -172,7 +170,26 @@ creates a full history of the trajectory of the first puncture.
 
 ### Diagnostics
 
+We monitor the `Z4c` constraints (`bbh.z4c.user.hst`), the puncture's trajectories (`bbh.co_0.txt` and `bbh.co_1.txt`), and the multipoles of $\Psi_4$ at different extraction radii (`waveforms` folder). For example, the trajectories can be plotted from the terminal with the command 
+
+~~~bash
+gnuplot <<EOF
+set term sixel
+set size square
+set xlabel "x/M"
+set ylabel "y/M"
+plot "<cat output-????/bbh.co_0.txt" u 3:4 w l notitle, \
+     "<cat output-????/bbh.co_1.txt" u 3:4 w l notitle
+EOF
+~~~
+
+The trajectories of the punctures at some intermediate stage during the run are shown below:
+
+![Puncture trajectories](assets/puncture_trajectories.png)
+
 ## Horizons
+
+**TODO**
 
 ## Gravitational-Wave Data
 

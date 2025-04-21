@@ -16,8 +16,10 @@ parser.add_argument("--header", dest="header", default=0,
         type=int, metavar='N', help='Number of header lines to include')
 parser.add_argument("--tmax", dest="tmax", default=inf, type=float,
         help="Maximum time to include (default: inf)")
+parser.add_argument("--include-all-comments", dest="include_all_comments",
+        action="store_true", help="Include all comments in the output file")
 parser.add_argument("-i", "--include-comments", dest="include_comments",
-        action='store_true', help="Include comments in the output file")
+        action='store_true', help="Include comments from the first file only")
 parser.add_argument("-o", "--output", dest="output", required=True,
         help="Output file", metavar="output.dat")
 parser.add_argument("-t", "--time-idx", dest="tidx", type=int,
@@ -34,12 +36,13 @@ ifile.close()
 
 # Collate data
 told  = None
-for fname in args.input:
+for fnum, fname in enumerate(args.input):
     for dline in open(fname, 'r'):
         skip = False
         for c in args.comment:
             if dline[:len(c)] == c:
-                if args.include_comments:
+                if args.include_all_comments or (
+                        args.include_comments and fnum == 0):
                     ofile.write(dline)
                 skip = True
                 break

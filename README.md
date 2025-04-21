@@ -64,7 +64,7 @@ x3min = -1.0
 x3max = 1.0
 ~~~
 
-creates a refined region with a resolution $h = (2048/128)\cdot 2^{-11} = 0.0078125$ covering at least a region of extent $\pm 1$ around the location of the first black hole. This corresponds to ${\sim}32$ points across the coordinate diameter of the puncture. Note that, because `AthenaK` uses block-based AMR and enforces a maximum of 2:1 refinement between neighboring mesh blocks, the initial grid is composed of multiple nested refined regions. An outline of the grid in the vicinity of the punctures, obtained with [plot_mesh.py](https://github.com/IAS-Astrophysics/athenak/blob/main/vis/python/plot_mesh.py), is shown in the figure below.
+creates a refined region with a resolution $h = (2048/128)\cdot 2^{-11} = 0.0078125$ covering at least a region of extent $\pm 1$ around the location of the first black hole. This corresponds to ${\sim}32$ points across the coordinate radius of the relaxed puncture. Note that, because `AthenaK` uses block-based AMR and enforces a maximum of 2:1 refinement between neighboring mesh blocks, the initial grid is composed of multiple nested refined regions. An outline of the grid in the vicinity of the punctures, obtained with [plot_mesh.py](https://github.com/IAS-Astrophysics/athenak/blob/main/vis/python/plot_mesh.py), is shown in the figure below.
 
 ![Structure of the initial grid in the inner region of the domain.](assets/amr_grid_structure.png)
 
@@ -164,7 +164,7 @@ We use the script [tarsegment.sh](scripts/tarsegment.sh) to create separate tar 
 To analyze the data, we use the utility [collate.py](scripts/collate.py) to merge time series from different segments. For example,
 
 ~~~bash
-$ collate.py -o bbh.co_0.txt output-????/bbh.co_0.txt
+$ collate.py -t 2 -i -o bbh.co_0.txt output-????/bbh.co_0.txt
 ~~~
 
 creates a full history of the trajectory of the first puncture.

@@ -310,8 +310,6 @@ Run `Spectre CCE` with:
 For more on the Bondi format, refer to the 
 [Spectre CCE tutorial](https://spectre-code.org/tutorial_cce.html#autotoc_md58).
 
----
-
 #### BMS Transformation
 
 The output from `Spectre CCE` is not in the superrest frame. To transform the waveform, apply a
@@ -345,8 +343,6 @@ plt.plot(h.t, h.data[:, h.index(2, 2)])
 re = h.data[:, h.index(2, 2)].real
 im = h.data[:, h.index(2, 2)].imag
 ```
-
----
 
 #### Debugging Tools
 

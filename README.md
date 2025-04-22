@@ -238,6 +238,27 @@ An example is shown below.
 
 ### Fixed Radius Extraction
 
+`AthenaK` extracts the spin-weighted multipolar decomposition of the Weyl scalar $\Psi_4$ on coordinate spheres of different radius. The gravitational-wave strain in the $+$ and $\times$ polarization can be obtained by integrating the equation
+$$
+\ddot{h}_+ - i\, \ddot{h}_\times = \Psi_4.
+$$
+To avoid contaminating the strain data with red noise, this is typically done in the Fourier domain, after the application of a high-pass filter (the so-called fixed-frequency integration method).
+
+**WARNING.** `AthenaK`'s waveform data is not guaranteed to be sampled uniformly in time. For this reason, it is necessary to resample $\Psi_4$ before computing the Fourier transform.
+
+To compute waveforms, use the [scripts/waveforms/waveforms.sh](scripts/waveforms/waveforms.sh):
+```bash
+$ scripts/waveforms/waveforms.sh <path-to-simulation>
+```
+This script will take care of merging the data from all the segments, resampling it in time, and outputting both $\Psi_4$ and $h$ in a new subfolder `waveforms`. For instance:
+```bash
+$ ls waveforms
+
+rpsi4_imag_0010.txt  rpsi4_imag_0150.txt  rpsi4_real_0050.txt  rpsi4_real_0200.txt
+rpsi4_imag_0050.txt  rpsi4_imag_0200.txt  rpsi4_real_0100.txt  strain.h5
+rpsi4_imag_0100.txt  rpsi4_real_0010.txt  rpsi4_real_0150.txt
+```
+
 ### Cauchy Characteristics Extraction
 
 #### Background

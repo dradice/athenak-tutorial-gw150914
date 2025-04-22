@@ -29,4 +29,4 @@ ${ANALYSIS_HOME}/scripts/workflow/collate.py -i \
     output-????/horizon_0/output_*/horizon_BH_0_ahf_ihf_diags.txt
 ${ANALYSIS_HOME}/scripts/workflow/collate.py -i \
     -o horizon_BH_1_ahf_ihf_diags.txt \
-    output-????/horizon_0/output_*/horizon_BH_1_ahf_ihf_diags.txt
+    output-????/horizon_1/output_*/horizon_BH_1_ahf_ihf_diags.txt

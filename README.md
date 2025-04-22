@@ -159,9 +159,9 @@ batch.sub     bbh.z4c.user.hst  ENVIRONMENT  JOBID      parent       rst
 bbh.co_0.txt  bin               horizon_0    N128.err   parfile.par  waveforms
 ~~~
 
-We use the script [tarsegment.sh](scripts/tarsegment.sh) to create separate tar archives of the restart files, 2D/3D binary outputs, etc., which typically have different lifetimes.
+We use the script [tarsegment.sh](scripts/waveforms//tarsegment.sh) to create separate tar archives of the restart files, 2D/3D binary outputs, etc., which typically have different lifetimes.
 
-To analyze the data, we use the utility [collate.py](scripts/collate.py) to merge time series from different segments. For example,
+To analyze the data, we use the utility [collate.py](scripts/workflow//collate.py) to merge time series from different segments. For example,
 
 ~~~bash
 $ collate.py -t 2 -i -o bbh.co_0.txt output-????/bbh.co_0.txt
@@ -188,16 +188,59 @@ The trajectories of the punctures at some intermediate stage during the run are 
 
 ![Puncture trajectories](assets/puncture_trajectories.png)
 
-## Horizons
+## Apparent Horizons
 
-**TODO**
+`AthenaK` does not yet include an apparent horizon finder. Instead, the code is set up to dump data in the vicinity of the puncture, which can later be processed using the [Einstein Toolkit](https://einsteintoolkit.org/). The "horizon" dump resolution and output frequency is specified in the input file:
+
+~~~text
+## Horizon Finder
+dump_horizon_0  = true
+co_0_dump_radius = 2
+horizon_0_Nx     = 100
+dump_horizon_1  = true
+co_1_dump_radius = 2
+horizon_1_Nx     = 100
+horizon_dt = 5
+~~~
+
+We have collected a minimal copy of the `Einstein Toolkit` in [this repository](https://github.com/HengruiZhu99/ahfind). This can be compiled using the command
+
+```bash
+$ cd ahfind
+$ ./make_config-runmefirst-getlapackblas
+$ make -j4
+```
+
+To compute the horizon properties we can then run the [horizon.sh](scripts/horizon/horizon.sh) script
+
+```bash
+$ scripts/horizon/horizon.sh <path-to-simulation>
+```
+
+The output files `horizon_BH_0_ahf_ihf_diags.txt` and `horizon_BH_1_ahf_ihf_diags.txt` will contain the properties of the horizons as a function of time.
+
+Additional diagnostics are availlable within each subfolder of `horizon_0` and `horizon_1`. For example, the file `latest_ah_surface.gp` stores the coordinate shape of the apparent horizon. This can be plotted, e.g., with
+
+```bash
+gnuplot <<EOF
+set term sixel
+set contour
+set key off
+splot "latest_ah_surface.gp" u 4:5:6 w l notitle
+EOF
+```
+
+An example is shown below.
+
+![Black hole apparent horizon](assets/AH_surface.png)
 
 ## Gravitational-Wave Data
 
 ### Fixed Radius Extraction
 
 ### Cauchy Characteristics Extraction
-# Background
+
+#### Background
 
 To compute the CCE strains, we require the spherical harmonics coefficients 
 of the ADM variables on a nested set of spherical shells at various time steps.
@@ -217,7 +260,7 @@ values of ADM variables are written to a binary format file (`.bin`)
 to be used in world tube boundary data of the `Spectre CCE` code.
 
 
-# Requirements
+#### Requirements
 
 1. [`Spectre CCE` executable](https://spectre-code.org/tutorial_cce.html)  
 2. [`scri` (BMS transformation package)](https://scri.readthedocs.io/en/latest/README.html)  
@@ -229,9 +272,9 @@ to be used in world tube boundary data of the `Spectre CCE` code.
 
 
 
-# Compute CCE Strains using `Spectre CCE`
+#### Compute CCE Strains using `Spectre CCE`
 
-### Step 1: Convert Boundary Data to Spectre Format
+##### Step 1: Convert Boundary Data to Spectre Format
 
 First, convert the binary boundary condition data into a format readable by 
 `Spectre CCE` using the script `athk_to_spectre.py`.
@@ -246,7 +289,7 @@ of the shell where the ADM data are interpolated.
 ./athk_to_spectre.py -ftype bin -radius [dump_extraction_radius] -d_out [output_directory]
 ```
 
-### Step 2: Run `Spectre CCE`
+##### Step 2: Run `Spectre CCE`
 
 After conversion, the output directory will contain an `.h5` file, 
 named like `CceRXXXX.h5`, where `XXXX` denotes the extraction radius.
@@ -269,7 +312,7 @@ For more on the Bondi format, refer to the
 
 ---
 
-# BMS Transformation
+#### BMS Transformation
 
 The output from `Spectre CCE` is not in the superrest frame. To transform the waveform, apply a
 _BMS transformation_ using `scri`. For more detail see:
@@ -305,16 +348,14 @@ im = h.data[:, h.index(2, 2)].imag
 
 ---
 
-# Debugging Tools
+#### Debugging Tools
 
-Use the `debug_athk_to_spectre.py` script to analyze and debug 
-the output of `athk_to_spectre.py`. You can inspect specific 
-spherical harmonic modes over time, or examine convergence and derivatives.
+Use the [debug_athk_to_spectre.py](scripts/cce/debug_athk_to_spectre.py) script to analyze and debug the output of [athk_to_spectre.py](scripts/cce/athk_to_spectre.py). You can inspect specific spherical harmonic modes over time, or examine convergence and derivatives.
 
 Example: Plot the real part of the $(2,2)$ mode of $g_{xx}(t)$
 
 ```bash
-./debug_athk_to_spectre.py -debug plot_simple \
+$ scripts/cce/debug_athk_to_spectre.py -debug plot_simple \
   -dout [output_directory] \
   -fpath [/path/to/CceRXXXX.h5] \
   -field_name "gxx" -field_mode "Re(2,2)"

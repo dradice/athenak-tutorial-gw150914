@@ -130,6 +130,12 @@ Note that `TwoPunctures` takes as input `par_b` and `center_offset` instead of t
 \texttt{par\_b} = \frac{|x_0 - x_1|}{2}, \qquad \texttt{center\_offset1} = x_0 - \texttt{par\_b}.
 ```
 
+It is also useful to estimate the initial orbital frequency of the binary:
+
+```math
+  f_0 = \frac{P_t}{2 \pi\, x_0\, m_0} \simeq 0.00467.
+```
+
 ## Running the Code
 
 ### Code Performance
@@ -242,7 +248,7 @@ An example is shown below.
 $$
 \ddot{h}_+ - i\, \ddot{h}_\times = \Psi_4.
 $$
-To avoid contaminating the strain data with red noise, this is typically done in the Fourier domain, after the application of a high-pass filter (the so-called fixed-frequency integration method).
+To avoid contaminating the strain data with red noise, this is typically done in the Fourier domain, after the application of a high-pass filter (the so-called fixed-frequency integration method). This requires us to choose a cutoff frequency $f_{\rm cut}$. To avoid removing physical parts of the waveform, $f_{\rm cut}$ should be smaller than $f_0/2$. The curoff frequency for different $m$ modes is computed as $f_{\rm cut}^m =f_{\rm cut}\, |m|/2$.
 
 **WARNING.** `AthenaK`'s waveform data is not guaranteed to be sampled uniformly in time. For this reason, it is necessary to resample $\Psi_4$ before computing the Fourier transform.
 
@@ -258,6 +264,28 @@ rpsi4_imag_0010.txt  rpsi4_imag_0150.txt  rpsi4_real_0050.txt  rpsi4_real_0200.t
 rpsi4_imag_0050.txt  rpsi4_imag_0200.txt  rpsi4_real_0100.txt  strain.h5
 rpsi4_imag_0100.txt  rpsi4_real_0010.txt  rpsi4_real_0150.txt
 ```
+
+The following python script shows how to plot the $(\ell,m)= (2,2)$ mode of the signal
+
+```python
+import h5py
+import matplotlib.pyplot as plt
+import numpy as np
+
+dfile = h5py.File("strain.h5", "r")
+t = np.array(dfile['r0100']['t'])
+h22 = np.array(dfile['r0100']['h[2,2]'])
+
+plt.plot(t, np.real(h22))
+plt.plot(t, np.imag(h22))
+plt.plot(t, np.abs(h22))
+
+plt.show()
+```
+
+The resulting waveform is shown below.
+
+![Finite radius extraction waveform](assets/fre_waveform.png)
 
 ### Cauchy Characteristics Extraction
 

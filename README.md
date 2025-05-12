@@ -334,35 +334,56 @@ This radius is typically set midway between the inner and outer radii
 of the shell where the ADM data are interpolated.
 
 ```bash
-# Convert binary dump data to Spectre-readable format:
-./athk_to_spectre.py -ftype bin -radius [dump_extraction_radius] -d_out [output_directory]
+./athk_to_spectre.py -ftype bin \
+                     -fpath [data_path] \
+                     -radius [dump_extraction_radius] \
+                     -d_out [output_directory]
 ```
-
-##### Step 2: Run `Spectre CCE`
 
 After conversion, the output directory will contain an `.h5` file, 
 named like `CceRXXXX.h5`, where `XXXX` denotes the extraction radius.
 
-Set the `CharacteristicExtract.yaml` config file as follows:
+##### Step 2: Prepare the WorldTube data
 
-```yaml
-BoundaryDataFilename: path/to/CceRXXXX.h5
-H5IsBondiData: false  # Since the data is not in Bondi format
-```
-
-Run `Spectre CCE` with:
+The next step is to convert the ADM data to worldtube Bondi-Sachs data. This can be done using the `PreprocessCceWorldtube` executable from `SpECTRE`:
 
 ```bash
-./CharacteristicExtract --input-file CharacteristicExtract.yaml
+apptainer exec spectre.sif \
+    /work/spectre/build/bin/PreprocessCceWorldtube \
+    --input-file PreprocessCceWorldtube.yaml 
+```
+
+An example input file for `PreprocessCceWorldtube` is listed below.
+
+```yaml
+InputH5File: CceR0050.00.h5
+OutputH5File: ReducedWorldtubeR0050.h5
+ExtractionRadius: 50
+FixSpecNormalization: False
+DescendingM: False
+BufferDepth: Auto
+LMaxFactor: 3
+InputDataFormat: MetricModal
 ```
 
 For more on the Bondi format, refer to the 
 [Spectre CCE tutorial](https://spectre-code.org/tutorial_cce.html#autotoc_md58).
 
+##### Step 3: Run `Spectre CCE`
+
+The `ReducedWorldtubeR0050.h5` data can finally be used to compute the waveform.
+
+Set the`BoundaryDataFilename` variable in [CharacteristicExtract.yaml](scripts/cce/CharacteristicExtract.yaml) to point to `ReducedWolrdtubeR0050.h5` and then run `Spectre CCE` with:
+
+```bash
+apptainer exec spectre.sif \
+    /work/spectre/build/bin/CharacteristicExtract \
+    --input-file CharacteristicExtract.yaml
+```
+
 #### BMS Transformation
 
-The output from `Spectre CCE` is not in the superrest frame. To transform the waveform, apply a
-_BMS transformation_ using `scri`. For more detail see:
+The output from `Spectre CCE` is not in the superrest frame. To transform the waveform, apply a _BMS transformation_ using `scri`. For more detail see:
 
 - [Frame fixing](https://spectre-code.org/tutorial_cce.html#autotoc_md65)
 - [Scri tutorial](https://scri.readthedocs.io/en/latest/tutorial_abd.html#loading-cce-data-and-adjusting-the-bms-frame)

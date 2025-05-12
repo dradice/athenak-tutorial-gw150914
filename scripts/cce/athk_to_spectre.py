@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# Alireza Rashti - Oct 2024 (C)
+# Initial Version: Alireza Rashti - Oct 2024 (C)
+# Some Fixes by David Radice
 # usage:
 # $ ./me -h
 #
@@ -12,10 +13,12 @@ import numpy as np
 from scipy import special
 import math
 import argparse
+import fnmatch
 import h5py
 import struct
 import glob
 from scipy.interpolate import interp1d
+import os
 
 # from itertools import product
 # import matplotlib.pyplot as plt
@@ -24,6 +27,16 @@ from scipy.interpolate import interp1d
 # import re
 
 # ---------------------------------------------------------------------- #
+
+## {{{ http://code.activestate.com/recipes/499305/ (r3)
+def ilocate(pattern, root=os.curdir, followlinks=False):
+    '''Locate all files matching supplied filename pattern in and below
+    supplied root directory.'''
+    for path, dirs, files in os.walk(os.path.abspath(root),
+            followlinks=followlinks):
+        for filename in fnmatch.filter(files, pattern):
+            yield os.path.join(path, filename)
+## end of http://code.activestate.com/recipes/499305/ }}}
 
 # field names
 g_field_names = [
@@ -274,7 +287,6 @@ class AngularTransform:
 
         return self.transform_field_to_coeff_gl(field)
 
-
 def load(fpath: str, field_name: str, attrs: dict) -> list:
     """
     read the field accroding to attrs.
@@ -283,6 +295,7 @@ def load(fpath: str, field_name: str, attrs: dict) -> list:
       ret[g_re,3,2,:] = Re(C_2lm(t=3)) for all lm
       ret[g_im,3,2,:] = Im(C_2lm(t=3)) for all lm
     """
+    print(f"reading: {field_name}", flush=True)
 
     if attrs["file_type"] == "h5":
         lev_t = attrs["lev_t"]
@@ -310,7 +323,7 @@ def load(fpath: str, field_name: str, attrs: dict) -> list:
     elif attrs["file_type"] == "bin":
         # Load the list of files
         # TODO: this depends on file name
-        flist = sorted(glob.glob(fpath + "/cce_*.bin"))
+        flist = ilocate("cce_*.bin", root=fpath, followlinks=True)
         dat_real = []
         dat_imag = []
         t = []
@@ -329,13 +342,21 @@ def load(fpath: str, field_name: str, attrs: dict) -> list:
             t.append(time)
             dat_real.append(data_real[:, g_name_index[field_name], :])
             dat_imag.append(data_imag[:, g_name_index[field_name], :])
+        t = np.array(t)
         dat_real = np.array(dat_real)
         dat_imag = np.array(dat_imag)
-        t = np.array(t)
-        f_real = interp1d(t, dat_real, axis=0)
-        f_imag = interp1d(t, dat_imag, axis=0)
 
-        attrs["lev_t"] = len(flist)
+        isort = np.argsort(t)
+        t = t[isort]
+        dat_real = dat_real[isort]
+        dat_imag = dat_imag[isort]
+
+        _, iuniq = np.unique(t, return_index=True)
+        t = t[iuniq]
+        dat_real = dat_real[iuniq]
+        dat_imag = dat_imag[iuniq]
+
+        attrs["lev_t"] = t.shape[0]
         attrs["max_n"] = nr
         attrs["max_l"] = num_l_modes
         attrs["max_lm"] = int((num_l_modes + 1) ** 2)
@@ -350,9 +371,8 @@ def load(fpath: str, field_name: str, attrs: dict) -> list:
             attrs["max_lm"],
         )
         ret = np.empty(shape=shape, dtype=float)
-        # NOTE: is it fine that we do interpolation?
-        ret[g_re, :] = f_real(attrs["time"])
-        ret[g_im, :] = f_imag(attrs["time"])
+        ret[g_re, :] = interp1d(t, dat_real, axis=0, copy=False)(attrs["time"])
+        ret[g_im, :] = interp1d(t, dat_imag, axis=0, copy=False)(attrs["time"])
     else:
         raise ValueError("no such option")
 
@@ -977,8 +997,7 @@ def main(args):
     r = 0.5[(r_1 - r_2)*x + (r_2 + r_1)], r_2 > r_1 & x = [1,-1]
     => x = -1 -> r = r_2
     => x = +1 -> r = r_1
-
-  """
+    """
     g_sign = int(-1) if args["ftype"] == "bin" else int(1)
 
     # check if output dir exist, if not, mkdir

@@ -345,6 +345,8 @@ named like `CceRXXXX.h5`, where `XXXX` denotes the extraction radius.
 
 ##### Step 2: Prepare the WorldTube data
 
+**TODO:** this step is only necessary with newer versions of `SpECTRE` and is currently not working. Jump directly to step 3, if you are using version `2024.09.29`.
+
 The next step is to convert the ADM data to worldtube Bondi-Sachs data. This can be done using the `PreprocessCceWorldtube` executable from `SpECTRE`:
 
 ```bash
@@ -401,18 +403,26 @@ abd = scri.create_abd_from_h5(
     file_name="/path/to/CharacteristicExtractReduction.h5",
     file_format="spectrecce_v1",
     ch_mass=1.0,
-    t_0_superrest=t0,  # time after junk radiation
-    padding_time=w0    # ~2 orbital periods
+    t_0_superrest=t0,     # time after junk radiation
+    padding_time=w0,      # ~2 orbital periods
+    t_interpolate=times   # resample data to reduce memory load
 )
 h = abd.h
 
 # Plot h_22 mode
-plt.plot(h.t, h.data[:, h.index(2, 2)])
+plt.plot(h.t, np.real(h.data[:, h.index(2, 2)]))
+plt.plot(h.t, np.imag(h.data[:, h.index(2, 2)]))
 
 # Access real and imaginary parts
 re = h.data[:, h.index(2, 2)].real
 im = h.data[:, h.index(2, 2)].imag
 ```
+
+This is how the CCE waveform looks like
+
+![CCE waveform produced with AthenaK + SpECTRE](assets/cce_waveform.png)
+
+We provide a script to convert the CCE data to SpEC waveform data format: [super_rest.py](scripts/cce/super_rest.py).
 
 #### Debugging Tools
 

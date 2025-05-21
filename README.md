@@ -436,5 +436,3 @@ $ scripts/cce/debug_athk_to_spectre.py -debug plot_simple \
   -fpath [/path/to/CceRXXXX.h5] \
   -field_name "gxx" -field_mode "Re(2,2)"
 ```
-
-## Conclusions

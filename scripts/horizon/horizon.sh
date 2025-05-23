@@ -16,7 +16,8 @@ for segment in output-????; do
     if [ ! -f ${segment}.hor.done ]; then
         for hor in $segment/horizon_?; do
             for out in $hor/output_*; do
-                (cd $out && 
+                (cd $out &&
+                cp ${ANALYSIS_HOME}/scripts/horizon/ET_analyze_BHaH_data_horizon.par . &&
                 ${ANALYSIS_HOME}/ahfind/exe/cactus_einsteintoolkitanalysis \
                     ET_analyze_BHaH_data_horizon.par &> ET_analysis.log
                 )

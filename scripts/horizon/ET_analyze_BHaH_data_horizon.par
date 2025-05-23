@@ -1,0 +1,76 @@
+ActiveThorns = "PUGH SymBase CartGrid3D"
+cactus::cctk_itlast = 0
+#cactus::cctk_show_schedule = "yes" # //Disables initial scheduler printout.
+cactus::cctk_show_schedule = "no" # //Disables initial scheduler printout.
+cactus::cctk_show_banners  = "no" # // Disables banners.
+Driver::ghost_size = 0
+Driver::global_nsize = 100
+Driver::info = load
+grid::type = byrange
+
+grid::xmin = -2.000000e+00
+grid::xmax = 2.000000e+00
+grid::ymin = -2.000000e+00
+grid::ymax = 2.000000e+00
+grid::zmin = -2.000000e+00
+grid::zmax = 2.000000e+00
+ActiveThorns = ADMBase
+#ActiveThorns = "AHFinderDirect SphericalSurface SpaceMask StaticConformal IOUtil AEILocalInterp PUGHInterp PUGHReduce QuasiLocalMeasures IOBasic TmunuBase ADMCoupling ADMMacros LocalReduce"
+ActiveThorns = "AHFinderDirect SphericalSurface SpaceMask StaticConformal IOUtil AEILocalInterp  PUGHInterp PUGHReduce QuasiLocalMeasures IOBasic TmunuBase LocalReduce"
+ActiveThorns = "readBHaHdata"
+ADMBase::metric_type = "physical"
+AHFinderDirect::find_every                             = 1
+AHFinderDirect::geometry_interpolator_name             = "Lagrange polynomial interpolation"
+AHFinderDirect::geometry_interpolator_pars             = "order=4"
+AHFinderDirect::max_Newton_iterations__initial         = 100
+AHFinderDirect::max_Newton_iterations__subsequent      = 10
+AHFinderDirect::N_horizons                             = 1
+AHFinderDirect::output_BH_diagnostics                  = "yes"
+AHFinderDirect::reset_horizon_after_not_finding[1]     = "no"
+AHFinderDirect::set_mask_for_individual_horizon[1]     = "no"
+AHFinderDirect::surface_interpolator_name              = "Lagrange polynomial interpolation"
+AHFinderDirect::surface_interpolator_pars              = "order=4"
+AHFinderDirect::verbose_level                          = "physics details"
+#AHFinderDirect::verbose_level                         = "algorithm details"
+AHFinderDirect::which_surface_to_store_info[1]         = 0
+AHFinderDirect::run_at_CCTK_POSTSTEP = false
+AHFinderDirect::run_at_CCTK_ANALYSIS = true
+
+# Parameters of thorn QuasiLocalMeasures (implementing QuasiLocalMeasures)
+QuasiLocalMeasures::interpolator         = "Lagrange polynomial interpolation"
+QuasiLocalMeasures::interpolator_options = "order=4"
+# QuasiLocalMeasures::interpolator         = "Hermite polynomial interpolation"
+# QuasiLocalMeasures::interpolator_options = "order=3"
+QuasiLocalMeasures::num_surfaces         = 1
+QuasiLocalMeasures::spatial_order        = 2
+QuasiLocalMeasures::surface_index[0]     = 0
+QuasiLocalMeasures::verbose              = yes
+QuasiLocalMeasures::killing_vector_method = "axial"
+#QuasiLocalMeasures::veryverbose          = yes
+SphericalSurface::nsurfaces       = 1
+# You may find benefit using super high SphericalSurface resolutions with very high spin BHs
+# SphericalSurface::maxntheta       = 301
+# SphericalSurface::maxnphi         = 504
+# SphericalSurface::ntheta      [0] = 301
+# SphericalSurface::nphi        [0] = 504
+SphericalSurface::maxntheta       = 161
+SphericalSurface::maxnphi         = 324
+SphericalSurface::ntheta      [0] = 161
+SphericalSurface::nphi        [0] = 324
+SphericalSurface::nghoststheta[0] = 2
+SphericalSurface::nghostsphi  [0] = 2
+# SphericalSurface::set_spherical[1]= yes
+# SphericalSurface::radius       [1]= 40
+# SphericalSurface::radius       [2]= 80
+IOBasic::outInfo_every          = 1
+IOBasic::outInfo_vars           = "
+        QuasiLocalMeasures::qlm_scalars
+        QuasiLocalMeasures::qlm_spin[0]
+        QuasiLocalMeasures::qlm_radius[0]
+        QuasiLocalMeasures::qlm_mass[0]
+        QuasiLocalMeasures::qlm_3det[0] "
+IOUtil::out_dir = "AHET_out_horizon_BH_0_ahf_ihf_diags"
+readBHaHdata::outfilename = "horizon_BH_0_ahf_ihf_diags.txt"
+readBHaHdata::recent_ah_radius_max_filename = "ah_radius_max_BH_0.txt"
+AHFinderDirect::initial_guess_method[1]                = "coordinate sphere"
+AHFinderDirect::initial_guess__coord_sphere__radius[1] = 5.000000e-01

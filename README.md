@@ -442,7 +442,7 @@ This is how the CCE waveform looks like
 
 ![CCE waveform produced with AthenaK + SpECTRE](assets/cce_waveform.png)
 
-We provide a script to convert the CCE data to SpEC waveform data format: [super_rest.py](scripts/cce/super_rest.py).
+We provide a script to convert the CCE data to SpEC waveform data format: [super_rest.py](scripts/cce/super_rest.py). The `scri` package also includes utilities to compute the radiated energy and momentum from the binary, which are demonstrated in [energetics.py](scripts/cce/energetics.py).
 
 #### Debugging Tools
 

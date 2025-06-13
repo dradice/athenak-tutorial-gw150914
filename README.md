@@ -265,9 +265,9 @@ An example is shown below.
 ### Fixed Radius Extraction
 
 `AthenaK` extracts the spin-weighted multipolar decomposition of the Weyl scalar $\Psi_4$ on coordinate spheres of different radius. The gravitational-wave strain in the $+$ and $\times$ polarization can be obtained by integrating the equation
-$$
+```math
 \ddot{h}_+ - i\, \ddot{h}_\times = \Psi_4.
-$$
+```
 To avoid contaminating the strain data with red noise, this is typically done in the Fourier domain, after the application of a high-pass filter (the so-called fixed-frequency integration method). This requires us to choose a cutoff frequency $f_{\rm cut}$. To avoid removing physical parts of the waveform, $f_{\rm cut}$ should be smaller than $f_0/2$. The curoff frequency for different $m$ modes is computed as $f_{\rm cut}^m =f_{\rm cut}\, |m|/2$.
 
 **WARNING.** `AthenaK`'s waveform data is not guaranteed to be sampled uniformly in time. For this reason, it is necessary to resample $\Psi_4$ before computing the Fourier transform.
